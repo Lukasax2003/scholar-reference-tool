@@ -27,6 +27,7 @@ def format_reference(bib, style):
 
 # === Streamlit UI ===
 st.set_page_config(page_title="Scholar Reference Tool", page_icon="📚")
+st.image("logo.png", width=150)  # You can adjust the width
 st.title("📚 Google Scholar Reference Exporter")
 st.markdown("Easily extract and download the **most recent publications** from any Google Scholar profile in your preferred referencing style.")
 
