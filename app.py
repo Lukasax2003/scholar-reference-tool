@@ -33,17 +33,25 @@ style = st.selectbox("Choose Referencing Style", ["APA", "MLA", "Chicago", "Harv
 if st.button("Generate References"):
     match = re.search(r'user=([\w-]+)', url)
     if not match:
-        st.error("Invalid Google Scholar URL.")
+        st.error("❌ Invalid Google Scholar URL.")
     else:
         user_id = match.group(1)
-        author = scholarly.search_author_id(user_id)
-        author = scholarly.fill(author)
-        publications = author['publications'][:top_n]
+        try:
+            author = scholarly.search_author_id(user_id)
+            author = scholarly.fill(author)
+
+            # Get most recent publications
+            filled_pubs = [scholarly.fill(pub) for pub in author['publications'] if 'pub_year' in scholarly.fill(pub)['bib']]
+            sorted_pubs = sorted(filled_pubs, key=lambda p: int(p['bib']['pub_year']), reverse=True)
+            publications = sorted_pubs[:top_n]
+
+        except Exception as e:
+            st.error(f"❌ Error loading profile: {e}")
+            st.stop()
 
         ref_list = []
         for pub in publications:
-            pub_filled = scholarly.fill(pub)
-            bib = pub_filled['bib']
+            bib = pub['bib']
             formatted = format_reference(bib, style)
             ref_list.append({"Reference": formatted})
 
